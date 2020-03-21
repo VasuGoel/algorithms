@@ -1,10 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-void swap(int &a, int &b) {
-    int temp = a; a = b; b = temp;
-}
-
 void insert(vector<int> &heap, int val) {
     heap.push_back(val);
     int index = heap.size()-1;
@@ -21,7 +17,7 @@ int delete_max(vector<int> &heap) {
     heap[0] = heap[heap.size()-1];
     heap.pop_back();
     int index = 0;
-    while((heap[index] < heap[2*index+1] || heap[index] < heap[2*index+2]) && (2*index+1 <= heap.size()-1 || 2*index+2 <= heap.size()-1)) {
+    while((2*index+1 <= heap.size()-1 && 2*index+2 <= heap.size()-1) && (heap[index] < heap[2*index+1] || heap[index] < heap[2*index+2])) {
         if(heap[2*index+1] >= heap[2*index+2]) {
             swap(heap[index], heap[2*index+1]);
             index = 2*index+1;
@@ -29,6 +25,9 @@ int delete_max(vector<int> &heap) {
             swap(heap[index], heap[2*index+2]);
             index = 2*index+2;
         }
+    }
+    if(2*index+1 <= heap.size()-1 && 2*index+2 > heap.size()-1) {
+        if(heap[index] < heap[2*index+1])  swap(heap[index], heap[2*index+1]);
     }
     return root;
 }
@@ -44,7 +43,7 @@ void heapify(vector<int> &heap) {
     int leaves = ceil(heap.size()/2);
     for(int i = heap.size()-leaves-1; i >= 0; i--) {
         int index = i;
-        while((heap[index] < heap[2*index+1] || heap[index] < heap[2*index+2]) && (2*index+1 <= heap.size()-1 || 2*index+2 <= heap.size()-1)) {
+        while((2*index+1 <= heap.size()-1 && 2*index+2 <= heap.size()-1) && (heap[index] < heap[2*index+1] || heap[index] < heap[2*index+2])) {
             if(heap[2*index+1] >= heap[2*index+2]) {
                 swap(heap[index], heap[2*index+1]);
                 index = 2*index+1;
@@ -52,6 +51,9 @@ void heapify(vector<int> &heap) {
                 swap(heap[index], heap[2*index+2]);
                 index = 2*index+2;
             }
+        }
+        if(2*index+1 <= heap.size()-1 && 2*index+2 > heap.size()-1) {
+            if(heap[index] < heap[2*index+1])  swap(heap[index], heap[2*index+1]);
         }
     }
     cout << "Heap created.\n";
