@@ -14,6 +14,7 @@ public:
         VertexToHeap = new int[n+1];
         HeapToVertex = new int[n];
     }
+    void heap_swaps(vector<int> &heap, int index, int child);
     void fix_heap_down(vector<int> &heap, int index);
     void fix_heap_up(vector<int> &heap, int index);
     int delete_min(vector<int> &heap, vector<int> &distance);
@@ -50,28 +51,31 @@ void Graph::dijkstra(int source) {
     for(int i = 1; i <= n; i++)  cout << "Node " << i << ": " << distance[i] << '\n';
 }
 
+void Graph::heap_swaps(vector<int> &heap, int index, int child) {
+    swap(heap[index], heap[child]);
+    swap(VertexToHeap[HeapToVertex[index]], VertexToHeap[HeapToVertex[child]]);
+    swap(HeapToVertex[index], HeapToVertex[child]);
+}
+
 void Graph::fix_heap_down(vector<int> &heap, int index) {
-    while((heap[index] > heap[2*index+1] || heap[index] > heap[2*index+2]) && (2*index+1 <= heap.size()-1 || 2*index+2 <= heap.size()-1)) {
+    while((2*index+1 <= heap.size()-1 && 2*index+2 <= heap.size()-1) && (heap[index] > heap[2*index+1] || heap[index] > heap[2*index+2])) {
         if(heap[2*index+1] <= heap[2*index+2]) {
-            swap(heap[index], heap[2*index+1]);
-            swap(VertexToHeap[HeapToVertex[index]], VertexToHeap[HeapToVertex[2*index+1]]);
-            swap(HeapToVertex[index], HeapToVertex[2*index+1]);
+            heap_swaps(heap, index, 2*index+1);
             index = 2*index+1;
         } else {
-            swap(heap[index], heap[2*index+2]);
-            swap(VertexToHeap[HeapToVertex[index]], VertexToHeap[HeapToVertex[2*index+2]]);
-            swap(HeapToVertex[index], HeapToVertex[2*index+2]);
+            heap_swaps(heap, index, 2*index+2);
             index = 2*index+2;
         }
+    }
+    if(2*index+1 <= heap.size()-1 && 2*index+2 > heap.size()-1) {
+        if(heap[index] > heap[2*index+1])  heap_swaps(heap, index, 2*index+1);
     }
 }
 
 void Graph::fix_heap_up(vector<int> &heap, int index) {
     int parent = floor((index-1)/2);
     while(heap[index] < heap[parent] && index != 0) {
-        swap(heap[parent], heap[index]);
-        swap(VertexToHeap[HeapToVertex[index]], VertexToHeap[HeapToVertex[parent]]);
-        swap(HeapToVertex[index], HeapToVertex[parent]);
+        heap_swaps(heap, index, parent);
         index = parent;
         parent = floor((index-1)/2);
     }
@@ -86,17 +90,15 @@ int Graph::delete_min(vector<int> &heap, vector<int> &distance) {
     HeapToVertex[0] = HeapToVertex[heap.size()-1];
     if(heap.size() != 1)  heap.pop_back();
 
-    int index = 0;
-    fix_heap_down(heap, index);
+    fix_heap_down(heap, 0);
     return root_vertex;
 }
 
 void Graph::update_heap(vector<int> &heap, int node, int newDist) {
     int oldDist = heap[node];
     heap[node] = newDist;
-    int index = node;
-    if(newDist > oldDist)  fix_heap_down(heap, index);
-    else if(newDist < oldDist)  fix_heap_up(heap, index);
+    if(newDist > oldDist)  fix_heap_down(heap, node);
+    else if(newDist < oldDist)  fix_heap_up(heap, node);
 }
 
 int main() {
