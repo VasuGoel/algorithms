@@ -25,6 +25,12 @@ node *min_element(node *&);
 node *max_element(node *&);
 node *predecessor(node *&, int);
 node *successor(node *&, int);
+int count_total_nodes(node *&);
+int count_internal_nodes(node *&);
+int count_external_nodes(node *&);
+int height(node *&);
+node *clone_tree(node *&, node *&);
+void mirror_image(node *&);
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -33,7 +39,8 @@ int main() {
     vector<int> values;
     cout << "\n1. create_binary_tree()\t\t\t2. insert()\n3. search()\t\t\t\t\t\t4. delete()\n5. display_tree()"
          << "\t\t\t\t6. preorder_traversal()\n7. inorder_traversal()\t\t\t8. postorder_traveral()\n9. min_element()\t\t\t\t10. max_element()\n"
-         << "11. predecessor()\t\t\t\t12. successor()\n13. delete_tree()\t\t\t\t14. EXIT\n";
+         << "11. predecessor()\t\t\t\t12. successor()\n13. delete_tree()\t\t\t\t14. count_total_nodes()\n15. count_internal_nodes()\t\t16. count_external_nodes()\n"
+         << "17. height()\t\t\t\t\t18. mirror_image()\n19. EXIT\n";
     cout << "---------------------------------------------\n";
 
     do{
@@ -71,7 +78,8 @@ int main() {
                 if(search(tree, val))  delete_element(tree, val), cout << val << " deleted from tree.\n";
                 break;
 
-            case 5: display_tree(tree);
+            case 5: if(tree == nullptr)  cout << "Tree empty.\n";
+                else  cout << "Tree: \n", display_tree(tree);
                 break;
 
             case 6: if(tree != nullptr) {
@@ -96,42 +104,62 @@ int main() {
                 else  cout << "Tree empty.\n";
                 break;
 
-            case 10: if(tree != nullptr)  cout << "Maximum element: " << max_element(tree)->data << "\n";
+            case 10:if(tree != nullptr)  cout << "Maximum element: " << max_element(tree)->data << "\n";
                 else  cout << "Tree empty.\n";
                 break;
 
-            case 11: cout << "Enter value to find predecessor of: ";
+            case 11:cout << "Enter value to find predecessor of: ";
                 cin >> val;
                 if(search(tree, val))  {
                     node *pred = predecessor(tree, val);
                     if(pred != nullptr)  cout << "Predecessor of " << val << " : " << pred->data << "\n";
                     else  cout << val << " has no predecessor.\n";
-
                 }
                 else  cout << val << " not found in tree.\n";
                 break;
 
-            case 12: cout << "Enter value to find successor of: ";
+            case 12:cout << "Enter value to find successor of: ";
                 cin >> val;
                 if(search(tree, val))  {
                     node *succ = successor(tree, val);
                     if(succ != nullptr)  cout << "Successor of " << val << " : " << succ->data << "\n";
                     else  cout << val << " has no successor.\n";
-
                 }
                 else  cout << val << " not found in tree.\n";
                 break;
 
-            case 13: tree = nullptr;
+            case 13:tree = nullptr;
                 cout << "Tree deleted.\n";
                 break;
 
-            case 14: break;
+            case 14:cout << "Total nodes: " << count_total_nodes(tree) << "\n";
+                break;
 
-            default: cout << "Not a valid choice.\n";
+            case 15:cout << "Internal nodes: " << count_internal_nodes(tree) << "\n";
+                break;
+
+            case 16:cout << "External nodes: " << count_external_nodes(tree) << "\n";
+                break;
+
+            case 17:if(tree == nullptr)  cout << "Tree empty.\n";
+                else  cout << "Height of tree: " << height(tree) << "\n";
+                break;
+
+            case 18:if(tree == nullptr)  cout << "Tree empty.\n";
+                else {
+                    node *copy = clone_tree(copy, tree);
+                    mirror_image(copy);
+                    cout << "Mirror image of tree: \n";
+                    display_tree(copy);
+                }
+                break;
+
+            case 19:break;
+
+            default:cout << "Not a valid choice.\n";
                 break;
         }
-    } while(choice != 14);
+    } while(choice != 19);
     return 0;
 }
 
@@ -182,6 +210,7 @@ void delete_element(node *&tree, int val) {
     if(tree->parent == nullptr && tree->left == nullptr && tree->right == nullptr) {
         tree = nullptr;
         return;
+
     }
     if(tree->left == nullptr && tree->right == nullptr) {
         if(tree == tree->parent->left)  tree->parent->left = nullptr;
@@ -212,21 +241,16 @@ void delete_element(node *&tree, int val) {
 }
 
 void display_tree(node *&tree) {
-    if(tree == nullptr) {
-        cout << "Tree empty.\n";
-        return;
-    }
     queue<node *> q;
     q.push(tree);
     while(!q.empty()) {
         int level_node_count = q.size();
-        while(level_node_count > 0) {
+        while(level_node_count--) {
             node *node = q.front();
             cout << node->data << " ";
             q.pop();
             if(node->left != nullptr)  q.push(node->left);
             if(node->right != nullptr) q.push(node->right);
-            level_node_count--;
         }
         cout << "\n";
     }
@@ -299,5 +323,61 @@ node *successor(node *&tree, int val) {
             preptr = ptr->parent;
         }
         return preptr;
+    }
+}
+
+int count_total_nodes(node *&tree) {
+    if(tree == nullptr)  return 0;
+    else  return count_total_nodes(tree->left) + count_total_nodes(tree->right) + 1;
+}
+
+int count_internal_nodes(node *&tree) {
+    if(tree == nullptr)  return 0;
+    if(tree->left == nullptr && tree->right == nullptr)  return 0;
+    else  return count_internal_nodes(tree->left) + count_internal_nodes(tree->right) + 1;
+}
+
+int count_external_nodes(node *&tree) {
+    if(tree == nullptr)  return 0;
+    if(tree->left == nullptr && tree->right == nullptr)  return 1;
+    else  return count_external_nodes(tree->left) + count_external_nodes(tree->right);
+}
+
+int height(node *&tree) {
+    if(tree == nullptr)  return 0;
+    else {
+        int leftHeight = height(tree->left);
+        int rightHeight = height(tree->right);
+        if(leftHeight > rightHeight)  return leftHeight+1;
+        else  return rightHeight+1;
+    }
+}
+
+node *clone_tree(node *&cloned, node *&oldTree) {
+    vector<int> values;
+    queue<node *> q;
+    q.push(oldTree);
+    while(!q.empty()) {
+        int level_node_count = q.size();
+        while(level_node_count--) {
+            node *node = q.front();
+            values.push_back(node->data);
+            q.pop();
+            if(node->left != nullptr)  q.push(node->left);
+            if(node->right != nullptr) q.push(node->right);
+        }
+    }
+    create_binary_tree(cloned, values);
+    return cloned;
+}
+
+void mirror_image(node *&tree) {
+    if(tree == nullptr)  return;
+    else {
+        mirror_image(tree->left);
+        mirror_image(tree->right);
+        node *temp = tree->left;
+        tree->left = tree->right;
+        tree->right = temp;
     }
 }
