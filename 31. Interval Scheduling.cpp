@@ -23,7 +23,6 @@ vector<interval> interval_scheduler(vector<interval> &slots) {
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    int s, f;
     vector<interval> slots{{0,25}, {29, 33}, {0, 5},
                            {8, 15}, {18, 23}, {28, 34},
                            {0, 11}, {13, 19}, {21, 26}};
