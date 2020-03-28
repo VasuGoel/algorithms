@@ -4,7 +4,7 @@ using namespace std;
 typedef struct Node {
     char alphabet;
     double frequency;
-    Node *left, *right;
+    Node *left = nullptr, *right = nullptr;
 } node;
 
 node *newNode(char alphabet, double frequency) {
@@ -13,13 +13,12 @@ node *newNode(char alphabet, double frequency) {
     return new_node;
 }
 
-void heapify(vector<node *> &, vector<char> &, vector<double> &);
-void insert(vector<node *> &, node *);
-node *delete_min(vector<node *> &);
-node *huffman_tree(vector<node *> &);
-void huffman_codes(node *, vector<int>);
+void heapify(vector<node *>&, vector<char> &, vector<double>&);
+void insert(vector<node *>&, node *);
+node *delete_min(vector<node *>&);
+node *huffman_tree(vector<node *>&);
+void huffman_codes(node *, vector<int>&);
 void display_tree(node *);
-
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -80,17 +79,18 @@ node *delete_min(vector<node *> &heap) {
 }
 
 node *huffman_tree(vector<node *> &min_heap) {
+    node *left, *right, *top;
     while(min_heap.size() != 1) {
-        node *left = delete_min(min_heap);
-        node *right = delete_min(min_heap);
-        node *top = newNode('$', left->frequency + right->frequency);
+        left = delete_min(min_heap);
+        right = delete_min(min_heap);
+        top = newNode('$', left->frequency + right->frequency);
         top->left = left, top->right = right;
         insert(min_heap, top);
     }
     return delete_min(min_heap);
 }
 
-void huffman_codes(node *tree, vector<int> code) {
+void huffman_codes(node *tree, vector<int> &code) {
     if(tree->left != nullptr) {
         code.push_back(0);
         huffman_codes(tree->left, code), code.pop_back();
