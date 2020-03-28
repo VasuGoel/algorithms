@@ -31,10 +31,11 @@ int main() {
     heapify(min_heap, alphabets, frequency);
 
     node *root = huffman_tree(min_heap);
-    cout << "Huffman tree: \n";
+    cout << "\nHuffman tree: \n";
     display_tree(root);
 
     vector<int> code;
+    cout << "\nHuffman codes: \n";
     huffman_codes(root, code);
     return 0;
 }
